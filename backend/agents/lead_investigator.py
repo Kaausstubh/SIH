@@ -43,6 +43,15 @@ class LeadInvestigator:
             # Scale risk up slightly for severe data quality violations (e.g. inverted dates or negative balance)
             raw_score = min(100.0, raw_score + (dq_resp.score * 0.15))
 
+        # Critical escalation: When multiple agents flag CRITICAL or an agent identifies an extreme violation (>=88):
+        critical_agents = sum(1 for resp in agent_responses.values() if resp.risk_level == RiskLevel.CRITICAL)
+        max_agent_score = max(s_fin, s_prog, s_anom, s_geo)
+
+        if critical_agents >= 2 and max_agent_score >= 80.0:
+            raw_score = max(raw_score, 82.0 + (max_agent_score - 80.0) * 0.7)
+        elif max_agent_score >= 88.0:
+            raw_score = max(raw_score, 81.5 + (max_agent_score - 88.0) * 1.0)
+
         return round(min(100.0, max(0.0, raw_score)), 1)
 
     def calculate_confidence(
@@ -72,11 +81,11 @@ class LeadInvestigator:
         return round(min(98.0, max(45.0, total_conf)), 1)
 
     def determine_risk_level(self, score: float, weights: WeightConfig) -> RiskLevel:
-        if score >= weights.threshold_high + 1.0:
+        if score > weights.threshold_high:
             return RiskLevel.CRITICAL
-        elif score >= weights.threshold_medium + 1.0:
+        elif score > weights.threshold_medium:
             return RiskLevel.HIGH
-        elif score >= weights.threshold_low + 1.0:
+        elif score > weights.threshold_low:
             return RiskLevel.MEDIUM
         else:
             return RiskLevel.LOW

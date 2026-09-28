@@ -101,7 +101,7 @@ export async function fetchWorks(params: {
     if (typeof valA === "string") {
       return sortOrder === "asc" ? valA.localeCompare(valB) : valB.localeCompare(valA);
     }
-    return sortOrder === "asc" ? valB - valA : valA - valB;
+    return sortOrder === "asc" ? valA - valB : valB - valA;
   });
 
   const total = filtered.length;

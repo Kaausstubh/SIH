@@ -9,7 +9,7 @@ def test_health_endpoint():
     assert response.status_code == 200
     data = response.json()
     assert data["status"] == "healthy"
-    assert "TransTrack" in data["system"]
+    assert "Nirikshak" in data["system"]
 
 def test_works_summary_endpoint():
     response = client.get("/api/works/summary")

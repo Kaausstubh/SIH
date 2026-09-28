@@ -25,7 +25,7 @@ export const Navbar: React.FC<Props> = ({
           <div>
             <div className="flex items-center gap-2">
               <span className="font-mono font-black text-sm tracking-wider text-white">
-                TRANSTRACK 2
+                NIRIKSHAK
               </span>
               <span className="bg-amber-950/80 text-amber-300 border border-amber-800 text-[10px] font-bold px-1.5 py-0.5 rounded tracking-wider uppercase font-mono">
                 DEMO DATA — NOT OFFICIAL MPLADS DATA

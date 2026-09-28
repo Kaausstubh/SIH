@@ -27,26 +27,30 @@ interface Props {
   qualityIssueCount?: number;
 }
 
+import { useLanguage } from "../context/LanguageContext";
+
 export const Sidebar: React.FC<Props> = ({
   activeItem,
   onSelect,
   priorityCount = 0,
   qualityIssueCount = 0,
 }) => {
+  const { t } = useLanguage();
+
   const mainNav = [
     {
       id: "investigations",
-      label: "Investigations",
+      label: t("nav_investigations", "Investigations"),
       icon: SearchCode,
       badge: priorityCount > 0 ? priorityCount : undefined,
       badgeColor: "bg-[#FFF1F2] text-[#E11D48] border-[#FECDD3]",
     },
-    { id: "overview", label: "Dashboard", icon: LayoutDashboard },
-    { id: "map", label: "Map", icon: MapPin },
-    { id: "analytics", label: "Analytics", icon: BarChart3 },
+    { id: "overview", label: t("nav_overview", "Dashboard"), icon: LayoutDashboard },
+    { id: "map", label: t("nav_map", "Geographic Map"), icon: MapPin },
+    { id: "analytics", label: t("nav_analytics", "Analytics"), icon: BarChart3 },
     {
       id: "data-quality",
-      label: "Data Quality",
+      label: t("nav_data_quality", "Data Quality"),
       icon: CheckCircle2,
       badge: qualityIssueCount > 0 ? qualityIssueCount : undefined,
       badgeColor: "bg-[#FEFCE8] text-[#CA8A04] border-[#FEF08A]",
@@ -54,12 +58,12 @@ export const Sidebar: React.FC<Props> = ({
   ];
 
   const secondaryNav = [
-    { id: "ingest", label: "Data Ingestion", icon: Database },
-    { id: "methodology", label: "Settings", icon: Sliders },
+    { id: "ingest", label: t("nav_ingest", "Data Ingestion"), icon: Database },
+    { id: "methodology", label: t("nav_methodology", "Settings"), icon: Sliders },
   ];
 
   return (
-    <aside className="w-60 bg-white border-r border-[#E2E8F0] flex flex-col justify-between shrink-0 min-h-[calc(100vh-65px)] select-none">
+    <aside className="w-56 lg:w-60 bg-white border-r border-[#E2E8F0] flex flex-col justify-between shrink-0 h-full overflow-y-auto select-none">
       <div className="p-4 space-y-6">
         {/* Main Section */}
         <div>
@@ -143,9 +147,12 @@ export const Sidebar: React.FC<Props> = ({
 
       {/* Footer Multi-Agent Engine Status */}
       <div className="p-4 border-t border-[#E2E8F0] m-3 bg-[#F8FAFC] rounded-2xl text-xs text-[#64748B] space-y-1.5">
-        <div className="flex items-center gap-2 text-[#1E293B] font-bold">
-          <ShieldCheck className="w-4 h-4 text-[#16A66A]" />
-          <span>Active Audit System</span>
+        <div className="flex items-center justify-between text-[#1E293B] font-bold">
+          <div className="flex items-center gap-1.5">
+            <ShieldCheck className="w-4 h-4 text-[#16A66A]" />
+            <span>निरीक्षक कोर (Nirikshak)</span>
+          </div>
+          <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 font-bold border border-amber-200">v2.0</span>
         </div>
         <div className="flex items-center justify-between text-[11px]">
           <span>Specialist Agents:</span>

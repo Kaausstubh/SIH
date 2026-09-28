@@ -53,3 +53,5 @@ backend/transtrack2.db
 Thumbs.db
 .vscode/
 .idea/
+
+backend/nirikshak.db

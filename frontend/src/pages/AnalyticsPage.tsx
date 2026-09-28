@@ -15,8 +15,13 @@ import {
 } from "recharts";
 import type { DashboardSummary } from "../types";
 import { fetchSummary, formatINR } from "../services/api";
+import { AgencyNexusGraph } from "../components/AgencyNexusGraph";
 
-export const AnalyticsPage: React.FC = () => {
+interface Props {
+  onSelectWork?: (id: string) => void;
+}
+
+export const AnalyticsPage: React.FC<Props> = ({ onSelectWork }) => {
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -201,6 +206,9 @@ export const AnalyticsPage: React.FC = () => {
           </ResponsiveContainer>
         </div>
       </div>
+
+      {/* Contractor Nexus & Implementing Agency Scrutiny */}
+      <AgencyNexusGraph onSelectWork={onSelectWork} />
     </div>
   );
 };

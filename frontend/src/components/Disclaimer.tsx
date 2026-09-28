@@ -7,7 +7,7 @@ export const Disclaimer: React.FC<{ compact?: boolean }> = ({ compact = false })
       <div className="bg-[#FAF9F5] border border-[#DDDDD7] rounded-[6px] px-3.5 py-2 flex items-center gap-2.5 text-xs text-[#6B706B]">
         <ShieldCheck className="w-4 h-4 text-[#214E3B] shrink-0" />
         <span>
-          <strong className="text-[#202321] font-semibold">Auditor Decision-Support Notice:</strong> TransTrack 2 identifies statistical indicators to prioritize review. It does not establish corruption, fraud, or legal wrongdoing.
+          <strong className="text-[#202321] font-semibold">Auditor Decision-Support Notice:</strong> Nirikshak identifies statistical indicators to prioritize review. It does not establish corruption, fraud, or legal wrongdoing.
         </span>
       </div>
     );

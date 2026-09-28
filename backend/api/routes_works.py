@@ -23,7 +23,7 @@ def list_works(
     sort_by: str = Query("risk_score", description="Column to sort by: risk_score, sanctioned_amount, expenditure, sanction_date"),
     sort_order: str = Query("desc", description="Sort direction: asc or desc"),
     page: int = Query(1, ge=1),
-    limit: int = Query(25, ge=1, le=500),
+    limit: int = Query(25, ge=1, le=2000),
     db: Session = Depends(get_db)
 ):
     query = db.query(WorkModel)

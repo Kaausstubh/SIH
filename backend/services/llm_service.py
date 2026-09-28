@@ -1,3 +1,4 @@
+
 import os
 import json
 from typing import Dict, Any, List, Optional
@@ -70,7 +71,7 @@ class LLMService:
             response = client.chat.completions.create(
                 model="gpt-4o-mini",
                 messages=[
-                    {"role": "system", "content": "You are the Lead Investigator AI for TransTrack 2. Output strictly JSON matching the required schema."},
+                    {"role": "system", "content": "You are the Lead Investigator AI for Nirikshak. Output strictly JSON matching the required schema."},
                     {"role": "user", "content": prompt}
                 ],
                 response_format={"type": "json_object"},
@@ -83,7 +84,7 @@ class LLMService:
 
     def _build_synthesis_prompt(self, work: Dict[str, Any], agent_findings: Dict[str, Any], risk_score: float, confidence: float) -> str:
         return f"""
-You are the Lead Investigator AI in TransTrack 2 (MPLADS Risk & Audit Prioritization System).
+You are the Lead Investigator AI in Nirikshak (MPLADS Risk & Audit Prioritization System).
 Review these structured findings from specialist agents for Work ID '{work.get("work_id")}'.
 
 CRITICAL DIRECTIVES:
@@ -237,7 +238,7 @@ Respond with a JSON object matching this schema:
 
         # Executive summary
         exec_summary = (
-            f"TransTrack 2 multi-agent analysis for Work ID '{work_id}' ({work_type}, {district}) generated an overall "
+            f"Nirikshak multi-agent analysis for Work ID '{work_id}' ({work_type}, {district}) generated an overall "
             f"Risk Score of {risk_score}/100 with an Evidence Confidence rating of {confidence}%. "
             f"The assessment synthesizes structured findings from Financial, Progress, Geographic, and Anomaly Detection agents. "
         )

@@ -1,12 +1,12 @@
-# TransTrack 2 — AI-Powered MPLADS Risk & Investigation System
+# Nirikshak — AI-Powered MPLADS Risk & Investigation System
 
-> **Statutory Notice**: TransTrack 2 is a decision-support and audit-prioritization platform for monitoring the Members of Parliament Local Area Development Scheme (MPLADS). The system identifies statistical anomalies, financial variances, and progress irregularities based on available administrative data. It does **NOT** establish or declare fraud, corruption, or legal wrongdoing. All outputs prioritize human audit review and on-site physical verification.
+> **Statutory Notice**: Nirikshak is a decision-support and audit-prioritization platform for monitoring the Members of Parliament Local Area Development Scheme (MPLADS). The system identifies statistical anomalies, financial variances, and progress irregularities based on available administrative data. It does **NOT** establish or declare fraud, corruption, or legal wrongdoing. All outputs prioritize human audit review and on-site physical verification.
 
 ---
 
-## 1. What is TransTrack 2?
+## 1. What is Nirikshak?
 
-TransTrack 2 is an audit intelligence system designed to monitor, analyze, and prioritize MPLADS works across India. Unlike legacy auditing tools that output arbitrary black-box "fraud scores", TransTrack 2 utilizes a **multi-agent analytical architecture** backed by real statistical methods (Isolation Forest unsupervised learning, peer-group deviations, Z-score rankings) and specialized specialist agents.
+Nirikshak is an audit intelligence system designed to monitor, analyze, and prioritize MPLADS works across India. Unlike legacy auditing tools that output arbitrary black-box "fraud scores", Nirikshak utilizes a **multi-agent analytical architecture** backed by real statistical methods (Isolation Forest unsupervised learning, peer-group deviations, Z-score rankings) and specialized specialist agents.
 
 Findings from every agent are aggregated into an auditable **Central Evidence Object** and evaluated by a **Lead Investigator AI** to synthesize clear, evidence-grounded reports recommending targeted human/physical verification.
 
@@ -211,7 +211,7 @@ The platform ships with 250 realistic demo works across 5 states (Maharashtra, K
 ### Backend Setup
 ```bash
 # 1. From workspace root:
-cd "c:\Users\Victus\Desktop\BTP & SIH\TransTrack2"
+cd "c:\Users\Victus\Desktop\BTP & SIH\Nirikshak"
 
 # 2. Run backend test suite (optional verification):
 python -m pytest backend/tests/ -v
@@ -245,7 +245,7 @@ OPENAI_API_KEY="your_openai_api_key_here"
 DEFAULT_LLM_PROVIDER="auto" # 'gemini', 'openai', or 'rule_based'
 
 # Database URL (Default: local SQLite database)
-DATABASE_URL="sqlite:///backend/transtrack2.db"
+DATABASE_URL="sqlite:///backend/nirikshak.db"
 ```
 
 ---

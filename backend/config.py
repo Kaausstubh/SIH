@@ -5,12 +5,12 @@ from pydantic_settings import BaseSettings
 BASE_DIR = Path(__file__).resolve().parent
 
 class Settings(BaseSettings):
-    PROJECT_NAME: str = "TransTrack 2 — AI-Powered MPLADS Risk & Investigation System"
+    PROJECT_NAME: str = "निरीक्षक (Nirikshak) — AI-Powered MPLADS Risk & Investigation System"
     VERSION: str = "2.0.0"
     API_V1_STR: str = "/api"
     
     # Database
-    DATABASE_URL: str = os.getenv("DATABASE_URL", f"sqlite:///{BASE_DIR}/transtrack2.db")
+    DATABASE_URL: str = os.getenv("DATABASE_URL", f"sqlite:///{BASE_DIR}/nirikshak.db")
     
     # LLM Settings (Optional - fallback rule synthesizer used if missing)
     GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")

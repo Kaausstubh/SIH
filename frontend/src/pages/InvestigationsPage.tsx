@@ -129,7 +129,7 @@ export const InvestigationsPage: React.FC<Props> = ({ onSelectWork }) => {
             {summary?.total_works || 0}
           </p>
           <span className={`text-[11px] ${riskFilter === "" ? "text-slate-300" : "text-[#64748B]"}`}>
-            Total tracked works
+            Total audited works
           </span>
         </div>
 

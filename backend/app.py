@@ -23,18 +23,18 @@ async def lifespan(app: FastAPI):
     try:
         count = db.query(WorkModel).count()
         if count == 0:
-            print("[TransTrack 2] Database is empty. Loading demo dataset...")
+            print("[Nirikshak] Database is empty. Loading demo dataset...")
             if not SAMPLE_CSV_PATH.exists():
                 from backend.data.generator import generate_demo_dataset
                 generate_demo_dataset(target_count=250, output_path=str(SAMPLE_CSV_PATH))
             load_initial_demo_data(db, str(SAMPLE_CSV_PATH))
-            print("[TransTrack 2] Running initial multi-agent batch analysis & scoring...")
+            print("[Nirikshak] Running initial multi-agent batch analysis & scoring...")
             pipeline_service.batch_process_all_works(db)
-            print("[TransTrack 2] Multi-agent analysis complete. Ready.")
+            print("[Nirikshak] Multi-agent analysis complete. Ready.")
         else:
             # Refresh models in pipeline
             pipeline_service.refresh_models(db)
-            print(f"[TransTrack 2] Loaded {count} works from database.")
+            print(f"[Nirikshak] Loaded {count} works from database.")
     finally:
         db.close()
     yield
@@ -66,7 +66,7 @@ app.include_router(config_router, prefix=settings.API_V1_STR)
 def health_check():
     return {
         "status": "healthy",
-        "system": "TransTrack 2 — AI-Powered MPLADS Risk & Investigation System",
+        "system": settings.PROJECT_NAME,
         "version": settings.VERSION,
         "disclaimer": "Decision-support aid; does not establish legal wrongdoing."
     }

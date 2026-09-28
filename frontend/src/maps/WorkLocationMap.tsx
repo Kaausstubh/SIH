@@ -10,6 +10,8 @@ interface Props {
   onSelectWork: (workId: string) => void;
   selectedWorkId?: string;
   height?: string;
+  onFilterRisk?: (risk: string) => void;
+  activeRiskFilter?: string;
 }
 
 const MapRecenter: React.FC<{ center: [number, number]; zoom: number }> = ({ center, zoom }) => {
@@ -25,6 +27,8 @@ export const WorkLocationMap: React.FC<Props> = ({
   onSelectWork,
   selectedWorkId,
   height = "h-[560px]",
+  onFilterRisk,
+  activeRiskFilter = "",
 }) => {
   const validWorks = works.filter(
     (w) => w.latitude && w.longitude && !isNaN(w.latitude) && !isNaN(w.longitude)
@@ -36,40 +40,89 @@ export const WorkLocationMap: React.FC<Props> = ({
     : [20.5937, 78.9629];
   const zoom = selectedWork ? 12 : 5;
 
+  const critCount = validWorks.filter((w) => w.risk_level?.toUpperCase() === "CRITICAL").length;
+  const highCount = validWorks.filter((w) => w.risk_level?.toUpperCase() === "HIGH").length;
+  const medCount = validWorks.filter((w) => w.risk_level?.toUpperCase() === "MEDIUM").length;
+  const lowCount = validWorks.filter((w) => w.risk_level?.toUpperCase() === "LOW").length;
+
   const getColor = (risk: string) => {
     switch (risk?.toUpperCase()) {
       case "CRITICAL":
-        return "#F43F5E"; // Bright Rose Red
+        return "#EF4444"; // Vivid Crimson Red
       case "HIGH":
-        return "#F5A20A"; // Vivid Amber Orange
+        return "#F97316"; // Bright Amber Orange
       case "MEDIUM":
-        return "#F5C542"; // Bright Yellow
+        return "#EAB308"; // Bright Golden Yellow
       case "LOW":
-        return "#16A66A"; // Bright Emerald Green
+        return "#10B981"; // Vibrant Emerald Green
       default:
         return "#64748B";
     }
   };
 
+  // Render LOW markers first, then MEDIUM, HIGH, and CRITICAL on top
+  const sortedWorks = [...validWorks].sort((a, b) => {
+    const priority: Record<string, number> = {
+      LOW: 1,
+      MEDIUM: 2,
+      HIGH: 3,
+      CRITICAL: 4,
+    };
+    return (
+      (priority[a.risk_level?.toUpperCase() || ""] || 0) -
+      (priority[b.risk_level?.toUpperCase() || ""] || 0)
+    );
+  });
+
   return (
     <div className={`w-full ${height} rounded-3xl overflow-hidden border border-[#E2E8F0] relative shadow-xs`}>
-      {/* Interactive Legend Overlay */}
-      <div className="absolute top-4 right-4 z-[1000] bg-white/95 backdrop-blur-md border border-[#E2E8F0] rounded-2xl px-4 py-2 text-xs font-semibold flex items-center gap-3.5 shadow-md">
-        <span className="flex items-center gap-1.5 text-[#1E293B]">
-          <span className="w-2.5 h-2.5 rounded-full bg-[#F43F5E]" /> Critical
-        </span>
-        <span className="flex items-center gap-1.5 text-[#1E293B]">
-          <span className="w-2.5 h-2.5 rounded-full bg-[#F5A20A]" /> High
-        </span>
-        <span className="flex items-center gap-1.5 text-[#1E293B]">
-          <span className="w-2.5 h-2.5 rounded-full bg-[#F5C542]" /> Medium
-        </span>
-        <span className="flex items-center gap-1.5 text-[#1E293B]">
-          <span className="w-2.5 h-2.5 rounded-full bg-[#16A66A]" /> Low
-        </span>
-        <span className="text-[#64748B] border-l border-[#E2E8F0] pl-2 font-mono font-bold">
-          {validWorks.length} Geo-tagged
-        </span>
+      {/* Interactive Legend Overlay with Clickable Filter Pills */}
+      <div className="absolute top-4 right-4 z-[1000] bg-white/95 backdrop-blur-md border border-[#E2E8F0] rounded-2xl px-3 py-1.5 text-xs font-semibold flex items-center gap-1.5 shadow-md">
+        <button
+          onClick={() => onFilterRisk?.(activeRiskFilter === "CRITICAL" ? "" : "CRITICAL")}
+          title="Filter to Critical (Suspected Corruption)"
+          className={`flex items-center gap-1.5 px-2 py-1 rounded-xl transition cursor-pointer text-[#1E293B] ${
+            activeRiskFilter === "CRITICAL" ? "bg-[#FEF2F2] ring-1 ring-[#EF4444] font-bold" : "hover:bg-[#F8FAFC]"
+          }`}
+        >
+          <span className="w-2.5 h-2.5 rounded-full bg-[#EF4444]" /> Critical ({critCount})
+        </button>
+        <button
+          onClick={() => onFilterRisk?.(activeRiskFilter === "HIGH" ? "" : "HIGH")}
+          title="Filter to High Risk"
+          className={`flex items-center gap-1.5 px-2 py-1 rounded-xl transition cursor-pointer text-[#1E293B] ${
+            activeRiskFilter === "HIGH" ? "bg-[#FFF7ED] ring-1 ring-[#F97316] font-bold" : "hover:bg-[#F8FAFC]"
+          }`}
+        >
+          <span className="w-2.5 h-2.5 rounded-full bg-[#F97316]" /> High ({highCount})
+        </button>
+        <button
+          onClick={() => onFilterRisk?.(activeRiskFilter === "MEDIUM" ? "" : "MEDIUM")}
+          title="Filter to Medium Risk"
+          className={`flex items-center gap-1.5 px-2 py-1 rounded-xl transition cursor-pointer text-[#1E293B] ${
+            activeRiskFilter === "MEDIUM" ? "bg-[#FEFCE8] ring-1 ring-[#EAB308] font-bold" : "hover:bg-[#F8FAFC]"
+          }`}
+        >
+          <span className="w-2.5 h-2.5 rounded-full bg-[#EAB308]" /> Med ({medCount})
+        </button>
+        <button
+          onClick={() => onFilterRisk?.(activeRiskFilter === "LOW" ? "" : "LOW")}
+          title="Filter to Compliant Works (Good Job)"
+          className={`flex items-center gap-1.5 px-2 py-1 rounded-xl transition cursor-pointer text-[#1E293B] ${
+            activeRiskFilter === "LOW" ? "bg-[#ECFDF5] ring-1 ring-[#10B981] font-bold" : "hover:bg-[#F8FAFC]"
+          }`}
+        >
+          <span className="w-2.5 h-2.5 rounded-full bg-[#10B981]" /> Low ({lowCount})
+        </button>
+        <button
+          onClick={() => onFilterRisk?.("")}
+          title="Show All Works"
+          className={`text-[#64748B] border-l border-[#E2E8F0] pl-2 font-mono font-bold cursor-pointer hover:text-[#0F172A] ${
+            !activeRiskFilter ? "text-[#625BE8]" : ""
+          }`}
+        >
+          {validWorks.length} All
+        </button>
       </div>
 
       <MapContainer
@@ -84,20 +137,33 @@ export const WorkLocationMap: React.FC<Props> = ({
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
 
-        {validWorks.map((work) => {
+        {sortedWorks.map((work) => {
           const isSelected = work.work_id === selectedWorkId;
           const markerColor = getColor(work.risk_level);
+          const radius = isSelected
+            ? 11
+            : work.risk_level === "CRITICAL"
+            ? 7.5
+            : work.risk_level === "HIGH"
+            ? 6
+            : work.risk_level === "MEDIUM"
+            ? 5
+            : 4.5;
 
           return (
             <CircleMarker
               key={work.work_id}
               center={[work.latitude!, work.longitude!]}
-              radius={isSelected ? 10 : work.risk_level === "CRITICAL" ? 8 : 6}
+              radius={radius}
               pathOptions={{
-                color: isSelected ? "#0F172A" : "#FFFFFF",
+                color: isSelected
+                  ? "#0F172A"
+                  : work.risk_level === "CRITICAL"
+                  ? "#7F1D1D"
+                  : "#FFFFFF",
                 fillColor: markerColor,
-                fillOpacity: 0.9,
-                weight: isSelected ? 3 : 1.5,
+                fillOpacity: isSelected ? 1.0 : work.risk_level === "CRITICAL" ? 0.95 : 0.85,
+                weight: isSelected ? 3.5 : work.risk_level === "CRITICAL" ? 2 : 1.2,
               }}
             >
               <Popup>
@@ -105,6 +171,11 @@ export const WorkLocationMap: React.FC<Props> = ({
                   <div className="flex items-center justify-between gap-2 border-b border-[#E2E8F0] pb-2 mb-2">
                     <span className="font-mono font-extrabold text-[#625BE8]">{work.work_id}</span>
                     <RiskBadge level={work.risk_level} size="sm" />
+                  </div>
+                  <div className="mb-1.5">
+                    <span className="inline-block px-2 py-0.5 rounded-md bg-[#F1F5F9] text-[#475569] text-[10px] font-bold">
+                      {work.work_type}
+                    </span>
                   </div>
                   <p className="font-bold text-[#1E293B] line-clamp-2 mb-2">
                     {work.work_description}

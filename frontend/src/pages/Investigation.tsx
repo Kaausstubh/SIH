@@ -31,6 +31,8 @@ import { RiskBadge } from "../components/RiskBadge";
 import { Disclaimer } from "../components/Disclaimer";
 import { EvidenceTraceModal, type TraceData } from "../components/EvidenceTraceModal";
 import { WorkLocationMap } from "../maps/WorkLocationMap";
+import { OfficialAuditDossierModal } from "../components/OfficialAuditDossierModal";
+import { SatelliteVerificationPanel } from "../components/SatelliteVerificationPanel";
 
 interface Props {
   workId: string;
@@ -93,6 +95,7 @@ export const Investigation: React.FC<Props> = ({ workId, onBack, onSelectWork })
     "overview" | "specialist" | "peers" | "map" | "ledger"
   >("overview");
   const [traceData, setTraceData] = useState<TraceData | null>(null);
+  const [dossierMode, setDossierMode] = useState<"dossier" | "notice" | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const loadData = async (forceRefresh: boolean = false) => {
@@ -256,11 +259,20 @@ export const Investigation: React.FC<Props> = ({ workId, onBack, onSelectWork })
             <span>Re-analyze</span>
           </button>
           <button
-            onClick={handlePrint}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#1E293B] hover:bg-[#0F172A] text-white text-xs font-bold shadow-xs transition cursor-pointer"
+            onClick={() => setDossierMode("dossier")}
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-black text-amber-300 border border-slate-700 text-xs font-bold shadow-xs transition cursor-pointer"
+            title="Generate Official Statutory Audit Dossier"
           >
-            <Printer className="w-3.5 h-3.5" />
-            <span>Export Report</span>
+            <FileText className="w-3.5 h-3.5 text-amber-400" />
+            <span>Audit Dossier</span>
+          </button>
+          <button
+            onClick={() => setDossierMode("notice")}
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#E11D48] hover:bg-[#BE123C] text-white text-xs font-bold shadow-xs transition cursor-pointer"
+            title="Generate Physical Inspection Order under MPLADS Guidelines"
+          >
+            <ShieldAlert className="w-3.5 h-3.5" />
+            <span>Inspection Order</span>
           </button>
         </div>
       </div>
@@ -592,15 +604,9 @@ export const Investigation: React.FC<Props> = ({ workId, onBack, onSelectWork })
           </div>
         )}
 
-        {/* Spatial Map Tab */}
+        {/* Spatial & Satellite Verification Tab */}
         {activeTab === "map" && (
-          <div className="h-80 w-full rounded-2xl overflow-hidden border border-[#E2E8F0]">
-            <WorkLocationMap
-              works={[work]}
-              selectedWorkId={work.work_id}
-              onSelectWork={() => {}}
-            />
-          </div>
+          <SatelliteVerificationPanel work={work} />
         )}
 
         {/* Financial Ledger Tab */}
@@ -632,6 +638,16 @@ export const Investigation: React.FC<Props> = ({ workId, onBack, onSelectWork })
 
       {/* Evidence Trace Modal */}
       <EvidenceTraceModal data={traceData} onClose={() => setTraceData(null)} />
+
+      {/* Official Government Audit Dossier & Inspection Notice Modal */}
+      {data && (
+        <OfficialAuditDossierModal
+          isOpen={!!dossierMode}
+          onClose={() => setDossierMode(null)}
+          result={data}
+          mode={dossierMode || "dossier"}
+        />
+      )}
 
       {/* Audit Disclaimer */}
       <Disclaimer />

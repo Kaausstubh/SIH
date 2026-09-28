@@ -195,7 +195,7 @@ export const Dashboard: React.FC<Props> = ({
           <StatCard
             title="Total Works"
             value={summary?.total_works || 0}
-            subtext="Tracked projects"
+            subtext="Audited projects"
             trend="100% Ingested"
             icon={FileSpreadsheet}
             theme="purple"
