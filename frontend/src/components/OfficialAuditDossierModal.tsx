@@ -1,5 +1,5 @@
-import React from "react";
-import { X, Printer } from "lucide-react";
+import React, { useEffect, useCallback } from "react";
+import { X, Printer, ArrowLeft } from "lucide-react";
 import type { WorkInvestigationResult } from "../types";
 import { formatINR } from "../services/api";
 import { NirikshakLogo } from "./NirikshakLogo";
@@ -17,6 +17,40 @@ export const OfficialAuditDossierModal: React.FC<Props> = ({
   result,
   mode,
 }) => {
+  const handleClose = useCallback(() => {
+    if (window.history.state?.modal === "dossier") {
+      window.history.back();
+    } else {
+      onClose();
+    }
+  }, [onClose]);
+
+  // Sync with browser history and handle Escape key
+  useEffect(() => {
+    if (!isOpen) return;
+
+    // Push state so browser's native back button closes the modal
+    window.history.pushState({ modal: "dossier" }, "");
+
+    const handlePopState = () => {
+      onClose();
+    };
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        handleClose();
+      }
+    };
+
+    window.addEventListener("popstate", handlePopState);
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isOpen, onClose, handleClose]);
+
   if (!isOpen) return null;
 
   const { work, report } = result;
@@ -35,28 +69,54 @@ export const OfficialAuditDossierModal: React.FC<Props> = ({
   const lngStr = work.longitude !== undefined ? work.longitude.toFixed(4) : "N/A";
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto print:p-0 print:bg-white">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full my-8 overflow-hidden border border-slate-200 print:shadow-none print:border-none print:m-0 print:w-full print:max-w-none">
-        {/* Top Modal Action Bar (Hidden in Print) */}
-        <div className="bg-slate-900 text-white px-6 py-3.5 flex items-center justify-between no-print select-none">
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40">
+    <div
+      className="fixed inset-0 z-50 overflow-y-auto bg-black/70 backdrop-blur-sm p-2 sm:p-4 md:p-6 flex justify-center items-start print:p-0 print:bg-white print:static print:overflow-visible"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) handleClose();
+      }}
+    >
+      {/* Guaranteed viewport-fixed floating back button (never scrolls off-screen) */}
+      <button
+        onClick={handleClose}
+        className="fixed top-4 right-4 z-[60] flex items-center gap-2 px-4 py-2 rounded-full bg-slate-900 hover:bg-black text-white text-xs font-bold shadow-2xl backdrop-blur-md border border-slate-700 hover:border-slate-500 hover:scale-105 transition cursor-pointer no-print"
+        title="Close & Return to Case"
+      >
+        <ArrowLeft className="w-4 h-4 text-amber-400" />
+        <span>Back to Case</span>
+        <X className="w-3.5 h-3.5 text-slate-400" />
+      </button>
+
+      <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full my-4 sm:my-8 overflow-hidden border border-slate-200 print:shadow-none print:border-none print:m-0 print:w-full print:max-w-none relative animate-in fade-in zoom-in-95 duration-150">
+        {/* Top Modal Action Bar (Sticky, Hidden in Print) */}
+        <div className="sticky top-0 z-30 bg-slate-900 text-white px-4 sm:px-6 py-3 flex items-center justify-between no-print select-none shadow-md border-b border-slate-800">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <button
+              onClick={handleClose}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold transition cursor-pointer border border-slate-700 hover:border-slate-600 shadow-xs"
+              title="Go back to case file"
+            >
+              <ArrowLeft className="w-4 h-4 text-amber-400" />
+              <span>Back</span>
+            </button>
+            <span className="text-xs font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 truncate">
               {mode === "dossier" ? "Official Audit Dossier" : "Physical Inspection Order"}
             </span>
-            <span className="text-xs text-slate-400 font-mono">Ref: {refNo}</span>
+            <span className="text-[11px] text-slate-400 font-mono hidden md:inline truncate">Ref: {refNo}</span>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             <button
               onClick={handlePrint}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition cursor-pointer shadow-sm"
             >
               <Printer className="w-3.5 h-3.5" />
-              <span>Print / Download PDF</span>
+              <span className="hidden sm:inline">Print / Download PDF</span>
+              <span className="sm:hidden">Print</span>
             </button>
             <button
-              onClick={onClose}
-              className="p-1 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition cursor-pointer"
+              onClick={handleClose}
+              className="p-1.5 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition cursor-pointer"
+              title="Close modal"
             >
               <X className="w-5 h-5" />
             </button>
@@ -303,6 +363,33 @@ export const OfficialAuditDossierModal: React.FC<Props> = ({
           {/* Institutional Statutory Footer */}
           <div className="border-t border-slate-200 pt-3 text-[10px] text-slate-400 font-sans text-center">
             CONFIDENTIAL AUDIT MATERIAL &bull; FOR OFFICIAL ADMINISTRATIVE USE ONLY &bull; NIRIKSHAN VIGILANCE CELL
+          </div>
+        </div>
+
+        {/* Bottom Modal Actions Bar (Sticky/Pinned at bottom of modal card, Hidden in Print) */}
+        <div className="no-print bg-slate-100 border-t border-slate-200 px-6 py-4 flex flex-wrap items-center justify-between gap-3">
+          <button
+            onClick={handleClose}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-bold transition cursor-pointer shadow-2xs"
+          >
+            <ArrowLeft className="w-4 h-4 text-slate-600" />
+            <span>Back to Case File</span>
+          </button>
+
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handlePrint}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition cursor-pointer shadow-xs"
+            >
+              <Printer className="w-4 h-4" />
+              <span>Print / Download PDF</span>
+            </button>
+            <button
+              onClick={handleClose}
+              className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition cursor-pointer shadow-xs"
+            >
+              Close Dossier
+            </button>
           </div>
         </div>
       </div>

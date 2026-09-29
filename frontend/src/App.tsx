@@ -18,6 +18,34 @@ export function App() {
   const [refreshKey, setRefreshKey] = useState<number>(0);
   const [priorityCount, setPriorityCount] = useState<number>(0);
 
+  // Sync state with browser URL & history (enables browser Back/Forward buttons)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const work = params.get("work");
+    const tab = params.get("tab") as NavItem | null;
+    if (work) setSelectedWorkId(work);
+    if (tab) setActiveItem(tab);
+
+    const handlePopState = (event: PopStateEvent) => {
+      if (event.state?.modal) {
+        // Modal handles its own dismissal
+        return;
+      }
+      if (event.state && "workId" in event.state) {
+        setSelectedWorkId(event.state.workId);
+        if (event.state.activeItem) setActiveItem(event.state.activeItem);
+      } else {
+        const p = new URLSearchParams(window.location.search);
+        setSelectedWorkId(p.get("work"));
+        const t = p.get("tab") as NavItem | null;
+        if (t) setActiveItem(t);
+      }
+    };
+
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, []);
+
   // Load summary metrics for sidebar badge indicators
   useEffect(() => {
     const loadStats = async () => {
@@ -33,21 +61,29 @@ export function App() {
 
   const handleSelectWork = (workId: string) => {
     setSelectedWorkId(workId);
+    window.history.pushState({ workId, activeItem }, "", `?work=${encodeURIComponent(workId)}`);
   };
 
   const handleBackToDashboard = () => {
     setSelectedWorkId(null);
+    window.history.pushState({ workId: null, activeItem }, "", window.location.pathname);
   };
 
   const handleNavigate = (item: NavItem) => {
     setSelectedWorkId(null);
     setActiveItem(item);
+    window.history.pushState(
+      { workId: null, activeItem: item },
+      "",
+      item === "investigations" ? window.location.pathname : `?tab=${item}`
+    );
   };
 
   const handleDataChanged = () => {
     setRefreshKey((k) => k + 1);
     setSelectedWorkId(null);
     setActiveItem("investigations");
+    window.history.pushState({ workId: null, activeItem: "investigations" }, "", window.location.pathname);
   };
 
   return (

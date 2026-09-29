@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { X, Calculator, Database, ShieldAlert, Sparkles, CheckCircle, ArrowUpRight } from "lucide-react";
 import { formatINR } from "../services/api";
 
@@ -20,12 +20,26 @@ interface Props {
 }
 
 export const EvidenceTraceModal: React.FC<Props> = ({ data, onClose }) => {
+  useEffect(() => {
+    if (!data) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [data, onClose]);
+
   if (!data) return null;
 
   const isNumericCost = typeof data.observed === "number" && (data.metric.toLowerCase().includes("cost") || data.metric.toLowerCase().includes("amount") || data.metric.toLowerCase().includes("expenditure"));
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
+    <div
+      className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
       <div className="bg-white border border-[#E2E8F0] rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
         {/* Header */}
         <div className="bg-[#F8FAFC] border-b border-[#E2E8F0] px-6 py-4 flex items-center justify-between">
